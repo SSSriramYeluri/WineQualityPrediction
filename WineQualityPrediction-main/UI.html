@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quality Analysis of Wine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-top: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        input[type="file"] {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        #result {
+            margin-top: 20px;
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Predict the Quality of Your Wine</h1>
+    <form id="fileUploadForm" action="http://ec2-44-200-74-19.compute-1.amazonaws.com:5000/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileUploader">
+        <input type="submit" value="Analyze">
+    </form>
+    <p id="result" style="display: none;"></p>
+
+    <script>
+        document.getElementById("fileUploadForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const fileUploader = document.getElementById("fileUploader");
+            const file = fileUploader.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch("http://ec2-44-200-74-19.compute-1.amazonaws.com:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDisplay = document.getElementById("result");
+                resultDisplay.innerHTML = "Predicted F1 Score: " + data.f1_score;
+                resultDisplay.style.display = "block";
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+</html>
